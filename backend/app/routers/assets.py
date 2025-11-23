@@ -10,17 +10,23 @@ router = APIRouter(prefix="/assets", tags=["Assets"])
 async def get_assets(session: SessionDep):
     return await AssetService.get_all(session=session)
 
+@router.get("/by-ticker/{ticker}")
+async def get_asset_by_ticker(session: SessionDep, ticker: str):
+    return await AssetService.get_by_ticker(session=session, ticker=ticker)
+
 @router.get("/{asset_id}")
-async def get_asset(session: SessionDep, asset_id: int):
-    return await AssetService.get_one(session=session, asset_id=asset_id)
+async def get_asset_by_id(session: SessionDep, asset_id: int):
+    return await AssetService.get_by_id(session=session, asset_id=asset_id)
 
 @router.post("/")
 async def create_asset(session: SessionDep, asset_schema: AssetSchema):
     return await AssetService.create(session=session, asset_schema=asset_schema)
 
-@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{asset_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(session: SessionDep, asset_id: int):
     await AssetService.delete(session=session, asset_id=asset_id)
     return
+
+
 
 # get by ticker

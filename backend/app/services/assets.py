@@ -8,12 +8,19 @@ class AssetService:
         return await AssetRepository.get_all(session=session)
     
     @staticmethod
-    async def get_one(session, asset_id: int):
-        asset = await AssetRepository.get_one(session=session, asset_id=asset_id)
+    async def get_by_id(session, asset_id: int):
+        asset = await AssetRepository.get_by_id(session=session, asset_id=asset_id)
         if asset is None:
             raise HTTPException(404, "SZ user not found")
         return asset
-
+    
+    @staticmethod
+    async def get_by_ticker(session, ticker: str):
+        asset = await AssetRepository.get_by_ticker(session=session, ticker=ticker)
+        if asset is None:
+            raise HTTPException(404, "SZ user not found")
+        return asset
+    
     @staticmethod
     async def create(session, asset_schema):
         return await AssetRepository.create(session=session, 
@@ -24,7 +31,7 @@ class AssetService:
 
     @staticmethod
     async def delete(session, asset_id: int):
-        asset = await AssetRepository.get_one(session=session, asset_id=asset_id)
+        asset = await AssetRepository.get_by_id(session=session, asset_id=asset_id)
         if asset is None:
             raise HTTPException(404, "SZ user not found")
         

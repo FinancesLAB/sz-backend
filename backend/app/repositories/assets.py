@@ -1,6 +1,6 @@
 from sqlalchemy import select
 from app.models.asset import Asset
-from app.schemas.asset import AssetSchema
+
 class AssetRepository:
     @staticmethod
     async def get_all(session):
@@ -9,8 +9,15 @@ class AssetRepository:
         return result.scalars().all()
     
     @staticmethod
-    async def get_one(asset_id: int, session):
+    async def get_by_id(asset_id: int, session):
         query = select(Asset).where(Asset.id == asset_id)
+        result = await session.execute(query)
+        asset = result.scalar_one_or_none()
+        return asset
+    
+    @staticmethod
+    async def get_by_ticker(ticker: str, session):
+        query = select(Asset).where(Asset.ticker == ticker)
         result = await session.execute(query)
         asset = result.scalar_one_or_none()
         return asset
