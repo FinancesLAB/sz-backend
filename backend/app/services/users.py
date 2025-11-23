@@ -1,4 +1,3 @@
-from app.repositories.all import Repository
 from app.repositories.users import UsersRepository
 
 from fastapi import HTTPException

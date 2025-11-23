@@ -1,20 +1,17 @@
 from sqlalchemy import select
-from app.models.portfolio import PortfolioModel
-from app.models.asset import Asset
-from app.models.portfolio_position import PortfolioPositionModel
-from app.models.user import UserModel
+from app.models.user import UsersModel
 
 class UsersRepository:
     @staticmethod
     async def get_one(user_id: int, session):
-        query = select(UserModel).where(UserModel.id == user_id)
+        query = select(UsersModel).where(UsersModel.id == user_id)
         result = await session.execute(query)
         user = result.scalar_one_or_none()
         return user
     
     @staticmethod
     async def create(session, name: str, age: int):
-        new_user = UserModel(
+        new_user = UsersModel(
             name=name, 
             age=age
             )
@@ -24,12 +21,12 @@ class UsersRepository:
         return new_user
     
     @staticmethod
-    async def delete(session, user: UserModel):
+    async def delete(session, user: UsersModel):
         await session.delete(user)
         await session.commit()
     
     @staticmethod
     async def get_all(session):
-        query = select(UserModel)
+        query = select(UsersModel)
         result = await session.execute(query)
         return result.scalars().all()
