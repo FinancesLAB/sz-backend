@@ -32,3 +32,9 @@ class PortfolioPositionRepository:
     async def delete(session, portfolio_position: PortfolioPosition):
         await session.delete(portfolio_position)
         await session.commit()
+
+    @staticmethod
+    async def get_by_portfolio_id(session, portfolio_id):
+        query = select(PortfolioPosition).where(PortfolioPosition.portfolio_id == portfolio_id)
+        portfolio_positions = await session.execute(query)
+        return portfolio_positions.scalars.all()

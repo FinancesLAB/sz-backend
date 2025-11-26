@@ -2,7 +2,7 @@ from loguru import logger
 import aiohttp
 from backend.price_updater.clients.moex_client import MoexClient
 from backend.app.repositories.asset_prices import AssetPriceRepository
-import asyncio
+
 async def fetch_prices(moex: MoexClient):
     try:
         prices = await moex.get_all_prices()
