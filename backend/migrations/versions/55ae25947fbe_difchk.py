@@ -1,8 +1,8 @@
-"""init
+"""difchk
 
-Revision ID: ad24cca96422
+Revision ID: 55ae25947fbe
 Revises: 
-Create Date: 2025-11-27 22:07:51.415152
+Create Date: 2025-11-27 23:51:13.709800
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = 'ad24cca96422'
+revision: str = '55ae25947fbe'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -32,6 +32,7 @@ def upgrade() -> None:
                nullable=False,
                existing_server_default=sa.text('now()'))
     op.drop_constraint(op.f('portfolio_positions_portfolio_id_asset_id_key'), 'portfolio_positions', type_='unique')
+    op.create_unique_constraint('uix_portfolio_asset', 'portfolio_positions', ['portfolio_id', 'asset_id'])
     op.alter_column('portfolios', 'created_at',
                existing_type=postgresql.TIMESTAMP(),
                nullable=False,
@@ -62,6 +63,7 @@ def downgrade() -> None:
                existing_type=postgresql.TIMESTAMP(),
                nullable=True,
                existing_server_default=sa.text('now()'))
+    op.drop_constraint('uix_portfolio_asset', 'portfolio_positions', type_='unique')
     op.create_unique_constraint(op.f('portfolio_positions_portfolio_id_asset_id_key'), 'portfolio_positions', ['portfolio_id', 'asset_id'], postgresql_nulls_not_distinct=False)
     op.alter_column('portfolio_positions', 'created_at',
                existing_type=postgresql.TIMESTAMP(),

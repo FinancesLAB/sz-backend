@@ -1,12 +1,12 @@
 
-from sqlalchemy import ForeignKey, DateTime, Numeric
+from sqlalchemy import ForeignKey, DateTime, Numeric, UniqueConstraint
 from backend.app.core.database import Base
 from sqlalchemy.orm import Mapped, mapped_column
 from datetime import datetime
 
 class PortfolioPosition(Base):
     __tablename__ = "portfolio_positions"
-
+    __table_args__ = (UniqueConstraint("portfolio_id", "asset_id", name="uix_portfolio_asset"),)
     id: Mapped[int] = mapped_column(primary_key=True)
     portfolio_id: Mapped[int] = mapped_column(
         ForeignKey("portfolios.id", ondelete="CASCADE")
