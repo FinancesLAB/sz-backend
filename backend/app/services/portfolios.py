@@ -1,4 +1,4 @@
-from shared.repositories.portfolios import PortfolioRepository
+from shared.repositories.portfolio import PortfolioRepository
 
 from fastapi import HTTPException
 

@@ -1,4 +1,4 @@
-from shared.repositories.trades import TradeRepository
+from shared.repositories.trade import TradeRepository
 
 from fastapi import HTTPException
 
