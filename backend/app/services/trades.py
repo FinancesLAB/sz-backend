@@ -1,23 +1,24 @@
+from requests import session
 from shared.repositories.trade import TradeRepository
-
+from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 
 class TradeService:
-    @staticmethod
-    async def get_all_trades(session):
-        return await TradeRepository.get_all(session=session)
+    def __init__(self, session: AsyncSession):
+        self.session = session
+        self.repo = TradeRepository(session=session)
+
+    async def get_all_trades(self):
+        return await self.repo.get_all()
     
-    @staticmethod
-    async def get_trade_by_trade_id(session, trade_id: int):
-        trade = await TradeRepository.get_by_id(session=session, trade_id=trade_id)
+    async def get_trade_by_trade_id(self, trade_id: int):
+        trade = await self.repo.get_by_id(trade_id=trade_id)
         if trade is None:
             raise HTTPException(404, "SZ trade not found")
         return trade
 
-    @staticmethod
-    async def create_trade(session, trade_schema):
-        return await TradeRepository.create(
-            session=session,
+    async def create(self, trade_schema):
+        return await self.repo.create(
             portfolio_id=trade_schema.portfolio_id,
             asset_id=trade_schema.asset_id,
             direction=trade_schema.direction,
@@ -25,10 +26,9 @@ class TradeService:
             price=trade_schema.price
             )
 
-    @staticmethod
-    async def delete_trade(session, trade_id: int):
-        trade = await TradeRepository.get_by_id(session=session, trade_id=trade_id)
+    async def delete_trade(self, trade_id: int):
+        trade = await self.get_trade_by_trade_id(trade_id=trade_id)
         if trade is None:
             raise HTTPException(404, "SZ trade not found")
         
-        await TradeRepository.delete(session=session, trade=trade)
+        await self.repo.delete(trade=trade)

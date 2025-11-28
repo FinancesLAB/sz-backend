@@ -1,22 +1,24 @@
+from requests import session
 from sqlalchemy import select
 from shared.models.trade import Trade
+from sqlalchemy.ext.asyncio import AsyncConnection
 
 class TradeRepository:
-    @staticmethod
-    async def get_by_id(trade_id: int, session):
+    def __init__(self, session: AsyncConnection):
+        self.session = session
+
+    async def get_by_id(self, trade_id: int):
         query = select(Trade).where(Trade.id == trade_id)
-        result = await session.execute(query)
+        result = await self.session.execute(query)
         trade = result.scalar_one_or_none()
         return trade
     
-    @staticmethod
-    async def get_all(session):
+    async def get_all(self):
         query = select(Trade)
-        result = await session.execute(query)
+        result = await self.session.execute(query)
         return result.scalars().all()
     
-    @staticmethod
-    async def create(session, portfolio_id: int, asset_id: int, direction: str, quantity: int, price: int):
+    async def create(self, portfolio_id: int, asset_id: int, direction: str, quantity: int, price: int):
         new_trade = Trade(
             portfolio_id=portfolio_id,
             asset_id=asset_id,
@@ -24,14 +26,13 @@ class TradeRepository:
             quantity=quantity,
             price=price
         )
-        session.add(new_trade)
-        await session.commit()
-        await session.refresh(new_trade) # достать + айдишник от бд
+        self.session.add(new_trade)
+        await self.session.commit()
+        await self.session.refresh(new_trade) # достать + айдишник от бд
         return new_trade
     
-    @staticmethod
-    async def delete(session, trade: Trade):
-        await session.delete(trade)
-        await session.commit()
+    async def delete(self, trade: Trade):
+        await self.session.delete(trade)
+        await self.session.commit()
     
     
