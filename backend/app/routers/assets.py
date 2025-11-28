@@ -3,7 +3,7 @@ from fastapi import status
 from fastapi import APIRouter
 from backend.app.core.database import SessionDep
 from backend.app.services.assets import AssetService
-from backend.app.schemas.asset import AssetCreate, AssetResponse
+from backend.app.schemas.asset import AssetCreate, AssetResponse, AssetUpdate
 router = APIRouter(prefix="/assets", tags=["Assets"])
 
 @router.get("/", response_model=list[AssetResponse])
@@ -23,10 +23,13 @@ async def create_asset(session: SessionDep, asset_schema: AssetCreate):
     return await AssetService.create(session=session, asset_schema=asset_schema)
 
 @router.delete("/{asset_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_user(session: SessionDep, asset_id: int):
+async def delete_asset(session: SessionDep, asset_id: int):
     await AssetService.delete(session=session, asset_id=asset_id)
     return
 
-
-
-# get by ticker
+@router.patch("/{asset_id}")
+async def update_asset(session: SessionDep, asset_id: int, payload: AssetUpdate):
+    updated = await AssetService.update(session=session, asset_id=asset_id, data=payload.dict(exclude_unset=True))
+    await session.commit()
+    return updated
+## TODO : add sector column to other cruds

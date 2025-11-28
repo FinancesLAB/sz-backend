@@ -10,6 +10,8 @@ class Asset(Base):
     ticker: Mapped[str] = mapped_column(Text, unique=True, nullable=False)
     full_name: Mapped[str] = mapped_column(Text, nullable=True)
     type: Mapped[str] = mapped_column(Text, nullable=False)
+    sector: Mapped[str] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow
     )
+    

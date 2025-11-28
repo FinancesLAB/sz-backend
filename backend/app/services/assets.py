@@ -37,3 +37,10 @@ class AssetService:
         
         await AssetRepository.delete(session=session, asset=asset)
     
+    @staticmethod 
+    async def update(session, asset_id: int, data: dict):
+        asset = await AssetRepository.get_by_id(session=session, asset_id=asset_id)
+        if asset is None:
+            raise HTTPException(404, "SZ asset not found")
+        
+        await AssetRepository.update(session=session, asset=asset, data=data)

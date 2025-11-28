@@ -13,6 +13,7 @@ class AssetUpdate(AssetBase):
     ticker: str | None = None
     full_name: str | None = None
     type: str | None = None
+    sector: str | None = None
 
 class AssetResponse(AssetBase):
     id: int

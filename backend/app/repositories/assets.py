@@ -38,4 +38,13 @@ class AssetRepository:
     async def delete(session, asset: Asset):
         await session.delete(asset)
         await session.commit()
+
+    
+        
+    @staticmethod
+    async def update(session, asset: Asset, data: dict):
+        for field, value in data.items():
+            setattr(asset, field, value)
+        await session.flush()
+        return asset
     
