@@ -15,7 +15,7 @@ class TopPosition(BaseModel):
     weight_percent: float=Field(..., description="weight of asset in portfolio in percents")
 
 
-class PortfolioShapshotResponse(BaseModel):
+class PortfolioShapshotResponse(BaseModel): # rename
     portfolio_id: int=Field(..., description="portfolio ID")
     name: str=Field(..., description="portfolio name")
     total_value: float=Field(..., description="current value of portfolio")
@@ -25,3 +25,14 @@ class PortfolioShapshotResponse(BaseModel):
     currency: str=Field(..., description="currency of portfolio, for example: RUB")
     positions_count: int=Field(..., description="number of unique assets in portfolio")
     top_positions: List[TopPosition]=Field(..., description="top 3 positions in portfolio by value part in portfolio")
+
+
+class SectorPositions(BaseModel):
+    sector: str
+    current_value: float
+    weight_percent: float
+
+class SectorDistributionResponse(BaseModel):
+    portfolio_id : int
+    total_value: float
+    sectors: List[SectorPositions]
