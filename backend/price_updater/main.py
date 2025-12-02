@@ -2,10 +2,10 @@ import asyncio
 from loguru import logger
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from backend.app.core.database import async_session_maker
-from backend.price_updater.services.asset_registry import AssetRegistry
-from backend.price_updater.services.service import update_prices
-from backend.price_updater.config import UPDATE_INTERVAL
+from app.core.database import async_session_maker
+from price_updater.services.asset_registry import AssetRegistry
+from price_updater.services.service import update_prices
+from price_updater.config import UPDATE_INTERVAL
 
 asset_registry = AssetRegistry()
 

@@ -1,7 +1,6 @@
 from sqlalchemy import select
 from loguru import logger
-from backend.app.models.asset import Asset
-
+from shared.models.asset import Asset
 
 class AssetRegistry:
     def __init__(self):
