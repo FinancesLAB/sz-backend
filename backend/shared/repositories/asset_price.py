@@ -14,8 +14,6 @@ class AssetPriceRepository:
     async def create(self, obj_in: AssetPriceCreate):
         obj=AssetPrice(**obj_in.dict())
         self.session.add(obj)
-        # await self.session.commit()
-        # await self.session.refresh(obj)
         return obj
     
     async def get_all(self):
@@ -28,7 +26,7 @@ class AssetPriceRepository:
         result = await self.session.execute(query)
         return result.scalar_one_or_none()
     
-    async def get_prices_since(self, ids: list[int], since: datetime):
+    async def get_prices_since(self, ids: list[int], since: datetime) -> List[AssetPrice]:
         if not ids: return []
         query = (select(AssetPrice).where(AssetPrice.asset_id.in_(ids), AssetPrice.timestamp >= since))
         prices = await self.session.execute(query)
