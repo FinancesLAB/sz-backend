@@ -12,7 +12,7 @@ async def get_by_id(portfolio_id: int, service: PortfolioService=Depends(get_por
 async def get_all(service: PortfolioService=Depends(get_porfolio_service)):
     return await service.get_all_portfolios()
 
-@router.post("/{portfolio_id}", response_model=PortfolioResponse)
+@router.post("/", response_model=PortfolioResponse)
 async def create(payload: PortfolioCreate, service: PortfolioService = Depends(get_porfolio_service)):
     return await service.create_portfolio(payload)
 
