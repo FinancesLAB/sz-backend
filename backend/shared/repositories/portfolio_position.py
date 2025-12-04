@@ -1,7 +1,7 @@
 from sqlalchemy import select, func
 from shared.models.portfolio_position import PortfolioPosition
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas.portfolio_position import PortfolioPositionUpdate, PortfolioPositionCreate
+from app.schemas.portfolio_position import PortfolioPositionUpdate, PortfolioPositionCreate, PrettyPortfolioPosition
 
 class PortfolioPositionRepository:
     def __init__(self, session: AsyncSession):

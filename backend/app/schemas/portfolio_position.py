@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+# raw schemas for straigh repo answers
 class PortfolioPositionBase(BaseModel):
     portfolio_id: int
     asset_id: int
@@ -22,3 +23,13 @@ class PortfolioPositionResponse(PortfolioPositionBase):
 
     class Config:
         from_attributes=True
+
+
+
+class PrettyPortfolioPosition(BaseModel):
+    id: int
+    quantity: int
+    created_at: datetime
+    asset_id: int
+    ticker: str
+    avg_price: float
