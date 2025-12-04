@@ -24,6 +24,11 @@ class PortfolioPositionRepository:
         result = await self.session.execute(query)
         return result.scalar_one_or_none()
     
+    async def get_by_portfolio_id(self, portfolio_id: int):
+        query = select(PortfolioPosition).where(PortfolioPosition.portfolio_id == portfolio_id)
+        result = await self.session.execute(query)
+        return result.scalars().all()
+    
     async def update(self, portfolio_position: PortfolioPosition, obj_in: PortfolioPositionUpdate):
         update_data=obj_in.dict(exclude_unset=True)
         for field, value in update_data.items():

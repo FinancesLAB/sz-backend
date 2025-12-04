@@ -19,6 +19,12 @@ class PortfolioPositionService:
             raise HTTPException(404, "SZ portfolio position not found")
         return portfolio_position
     
+    async def get_by_portfolio_id(self, portfolio_id: int):
+        portfolio_positions = await self.repo.get_by_portfolio_id(portfolio_id=portfolio_id)
+        if not portfolio_positions:
+            raise HTTPException(404, "SZ portfolio position not found")
+        return portfolio_positions
+    
     async def create(self, obj_in: PortfolioPositionCreate):
         return await self.repo.create(obj_in=obj_in)
     

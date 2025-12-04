@@ -18,7 +18,10 @@ async def get_portfolio_positions(service: PortfolioPositionService=Depends(get_
 @router.post("/", response_model=PortfolioPositionResponse)
 async def create_portfolio_position(payload: PortfolioPositionCreate, service: PortfolioPositionService=Depends(get_porfolio_position_service)):
     return await service.create(payload)
-    
+
+@router.get("/portfolio/{portfolio_id}")
+async def get_positions_by_portfolio_id(portfolio_id: int, service: PortfolioPositionService=Depends(get_porfolio_position_service)):
+    return await service.get_by_portfolio_id(portfolio_id=portfolio_id)
 
 @router.delete("/{portfolio_position}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete(portfolio_position_id: int, service: PortfolioPositionService=Depends(get_porfolio_position_service)):
