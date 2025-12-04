@@ -5,7 +5,7 @@ class PortfolioPositionBase(BaseModel):
     portfolio_id: int
     asset_id: int
     quantity: int
-    avg_price: int
+    avg_price: float
 
 class PortfolioPositionCreate(PortfolioPositionBase):
     pass
