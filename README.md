@@ -54,3 +54,9 @@ Backend:
 - сделать и добавить в репо docker-compose
 - frontend клиент (react, next.js)
 - авторизация JWT / Oauth2
+
+Roles
+- Shamil Zakirzyanov — Backend Engineer & DevOps
+Архитектура БД, FastAPI, SQLAlchemy, модуль аналитика, DevOps, инфраструктура.
+- Alisher Sharipov Frontend Engineer
+Next.js, React, компоненты UI, роутинг, визуализация данных, интеграция API.
