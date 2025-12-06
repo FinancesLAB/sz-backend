@@ -1,7 +1,7 @@
 from shared.models.portfolio_position import PortfolioPosition
 from typing import List, Dict
 
-def calc_portfolio_current_value(positions: List[PortfolioPosition], current_prices: Dict[int, float]) -> int:
+def calc_portfolio_current_value(positions: List[PortfolioPosition], current_prices: Dict[int, float]) -> float:
     total_value=0
     for position in positions:
         total_value+=position.quantity * current_prices[position.asset_id]

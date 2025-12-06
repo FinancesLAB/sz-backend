@@ -1,5 +1,5 @@
-from typing import List
-from datetime import date, datetime, timedelta
+from typing import List, Dict
+from datetime import datetime, timedelta
 from shared.models.asset_price import AssetPrice
 from shared.repositories.asset_price import AssetPriceRepository
 from shared.repositories.portfolio import PortfolioRepository
@@ -18,13 +18,8 @@ from app.analytics.portfolio_snapshot import (
     calc_position_profit_percent,
     calc_position_weight_in_portfolio,
 )
-def get_portfolio_price_by_ts(ts: int, asset_prices: List[AssetPrice], id_to_q):
-    total_price = 0
-    for asset_price in asset_prices:
-        timestamp = asset_price.timestamp.replace(second=0, microsecond=0)
-        if timestamp == ts:
-            total_price += asset_price.price * id_to_q[asset_price.asset_id]
-    return total_price if total_price != 0 else None
+from app.analytics.portfolio_dynamics import get_timestamps_count_24h, get_sorted_timeseries_24h, get_portfolio_price_by_ts
+
         
 class AnalyticsService:
     def __init__(self, session: AsyncSession):
@@ -122,29 +117,23 @@ class AnalyticsService:
         positions = await self.portfolio_position_repo.get_by_portfolio_id(portfolio_id=portfolio_id)
         if not positions:
             return PortfolioDynamicsResponse.empty(portfolio=portfolio)
+
+        timestamp_now = datetime.utcnow()
         asset_ids = [pos.asset_id for pos in positions]
-        asset_prices = await self.asset_price_repo.get_prices_since(ids=asset_ids, since=datetime.utcnow() - timedelta(days=1) )
-        # берем 96 точек от сейчас до сейчас-24 часа, интервал 15 минут, если цены нет у какого то актива в конкретной точке то зануляем всю точку (затычка)
-        start = datetime.utcnow() - timedelta(days=1)
-        count = int ((datetime.utcnow() - start).total_seconds() / 60 / 15)
-        time_series = []
-        for i in range(count):
-            ts = (datetime.utcnow() - timedelta(minutes=15*i)).replace(second=0, microsecond=0)
-            time_series.append(ts)
-        time_series = sorted(time_series, reverse=False)
+
+        asset_prices = await self.asset_price_repo.get_prices_since(ids=asset_ids, since=timestamp_now - timedelta(days=1) )
+        
+        timestamps_count = get_timestamps_count_24h(ts_now=timestamp_now)
+        time_series = get_sorted_timeseries_24h(ts_now=timestamp_now, count=timestamps_count)
         asset_id_to_quantity = {}
         for pos in positions:
             asset_id_to_quantity[pos.asset_id] = pos.quantity
         data = []
         for ts in time_series:
-            total_value = get_portfolio_price_by_ts(ts, asset_prices, asset_id_to_quantity)
-            if total_value:
-                data.append(PortfolioPrice(timestamp=ts, total_value=get_portfolio_price_by_ts(ts, asset_prices, asset_id_to_quantity)))
+            data.append(PortfolioPrice(timestamp=ts, total_value=get_portfolio_price_by_ts(ts, asset_prices, asset_id_to_quantity)))
         
         return PortfolioDynamicsResponse(
             portfolio_id=portfolio.id,
             name=portfolio.name,
             data=data
         )
-
-        
