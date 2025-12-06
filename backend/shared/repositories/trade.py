@@ -35,6 +35,11 @@ class TradeRepository:
     async def delete(self, trade: Trade):
         await self.session.delete(trade)
         await self.session.commit()
+
+    async def get_trades_by_portfolio_id(self, portfolio_id: int):
+        query = select(Trade).where(Trade.portfolio_id == portfolio_id)
+        result = await self.session.execute(query)
+        return result.scalars().all()
     
     
 
