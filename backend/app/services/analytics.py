@@ -7,18 +7,7 @@ from shared.repositories.asset import AssetRepository
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 from app.schemas.analytics import PortfolioShapshotResponse, TopPosition, SectorDistributionResponse, SectorPosition, PortfolioPrice, PortfolioDynamicsResponse
-# from app.analytics.portfolio_snapshot import (
-#     calc_portfolio_current_value,
-#     calc_invested_value,
-#     calc_profit,
-#     calc_portfolio_profit_percent,
-#     calc_position_current_value,
-#     calc_position_profit,
-#     calc_position_profit_percent,
-#     calc_position_weight_in_portfolio,
-# )
-# from app.analytics.portfolio_dynamics import get_timestamps_count_24h, get_sorted_timeseries_24h, get_portfolio_price_by_ts
-
+from app.analytics.portfolio_snapshot import get_portfolio_purchase_price, get_asset_id_to_quantity_dict, calc_unrealized_pnl
 from shared.repositories.trade import TradeRepository
 
 class AnalyticsService:
@@ -39,86 +28,51 @@ class AnalyticsService:
                 total_value -= trade.quantity * trade.price
         return total_value
 
-    # async def portfolio_snapshot(self, portfolio_id: int) -> PortfolioShapshotResponse: # рассмотреть сырыe sql запросы для аналитики и свой репо
-    #     portfolio = await self.portfolio_repo.get_by_id(portfolio_id=portfolio_id)
-    #     if portfolio is None: 
-    #         raise HTTPException(404, "SZ portfolio not found")
-    #     # positions = await self.portfolio_position_repo.get_by_portfolio_id(portfolio_id)
-    #     trades = 
-    #     if not positions: 
-    #         return PortfolioShapshotResponse.empty(portfolio)
-    #     asset_ids=[pos.asset_id for pos in positions]
-    #     current_prices = await self.asset_price_repo.get_prices_dict_by_ids(asset_ids)
-    #     total_value = calc_portfolio_current_value(positions=positions, current_prices=current_prices)
-    #     invested_value = calc_invested_value(positions=positions)
-    #     total_profit = calc_profit(current_value=total_value, invested_value=invested_value)
-    #     total_profit_percent = calc_portfolio_profit_percent(profit=total_profit, invested_value=invested_value)
-    #     assets = await self.asset_repo.get_assets_dict_by_ids(asset_ids)
-    #     tops=list()
-    #     for pos in positions:
-    #         new_top = TopPosition(
-    #             asset_id=pos.asset_id,
-    #             ticker=assets[pos.asset_id].ticker,
-    #             full_name=assets[pos.asset_id].full_name,
-    #             quantity=pos.quantity,
-    #             avg_buy_price=pos.avg_price,
-    #             current_price=current_prices[pos.asset_id],
-    #             current_value=calc_position_current_value(position=pos, current_prices=current_prices),
-    #             profit=calc_position_profit(position=pos, current_prices=current_prices),
-    #             profit_percent = calc_position_profit_percent(position=pos, current_prices=current_prices),
-    #             weight_percent=calc_position_weight_in_portfolio(position=pos, current_prices=current_prices, total_value=total_value)
-    #         )
-    #         tops.append(new_top)
-    #     tops = sorted(tops, key=lambda pos: pos.current_value, reverse=True)
-    #     top_three=tops[:3]
-        # return PortfolioShapshotResponse(
-        #     portfolio_id=portfolio.id,
-        #     name=portfolio.name,
-        #     total_value=total_value,
-        #     total_profit=total_profit,
-        #     total_profit_percent=total_profit_percent,
-        #     invested_value=invested_value,
-        #     currency=portfolio.currency,
-        #     positions_count=len(positions),
-        #     top_positions=top_three
-
-        # )
     async def portfolio_snapshot(self, portfolio_id: int):
         portfolio = await self.portfolio_repo.get_by_id(portfolio_id)
         trades = await self.trade_repo.get_trades_by_portfolio_id(portfolio_id)
+        portfolio_purchase_price = get_portfolio_purchase_price(trades)
         asset_ids = [trade.asset_id for trade in trades]
         asset_ids = set(asset_ids)
         current_prices = await self.asset_price_repo.get_prices_dict_by_ids(asset_ids)
-        asset_id_to_quantity = dict.fromkeys(asset_ids, 0)
-        for trade in trades:
-            if trade.direction == "buy":
-                asset_id_to_quantity[trade.asset_id] += (trade.quantity )
-            elif trade.direction == "sell":
-                asset_id_to_quantity[trade.asset_id] -= (trade.quantity)
+        asset_id_to_quantity = get_asset_id_to_quantity_dict(trades)
         current_value = 0
         for asset_id, quantity in asset_id_to_quantity.items():
             current_value += current_prices[asset_id] * quantity
-        total_value = 0
-        for trade in trades:
-            if trade.direction == "buy":
-                total_value += trade.quantity * trade.price
-            elif trade.direction == "sell":
-                total_value -= trade.quantity * trade.price
-        profit = current_value - total_value
-        profit_percent = (profit / total_value) * 100
-        count = sum([1 if quantity != 0 else 0 for asset_id, quantity in asset_id_to_quantity.items() ])
+        profit = current_value - portfolio_purchase_price
+        count = sum(1 for quantity in asset_id_to_quantity.values() if quantity != 0)
+        resp = []
+        for asset_id, quantity in asset_id_to_quantity.items():
+            ticker = "UNK"
+            full_name = "fullname"
+            quantity = quantity
+            pos = TopPosition(
+                asset_id=asset_id,
+                ticker=ticker,
+                full_name=full_name,
+                quantity=quantity,
+                avg_buy_price=12,
+                current_price=0,
+                current_value=0,
+                profit=0,
+                profit_percent = 0,
+                weight_percent=0
+            )
+            resp.append(pos)
         
+
+
+        total_profit = calc_unrealized_pnl(portfolio_trades=trades, asset_prices=current_prices)
         return PortfolioShapshotResponse(
             portfolio_id=portfolio.id,
             name=portfolio.name,
             total_value=current_value,
             total_profit=profit,
-            total_profit_percent=profit_percent,
-            invested_value=total_value ,
+            total_profit_percent=(profit / portfolio_purchase_price) * 100,
+            invested_value=portfolio_purchase_price ,
             currency=portfolio.currency,
             positions_count=count,
-            top_positions=[]
-
+            top_positions=resp
         )
 
 #     async def sector_distribution(self, portfolio_id: int) -> SectorDistributionResponse:
