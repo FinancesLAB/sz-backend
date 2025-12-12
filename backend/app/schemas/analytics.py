@@ -18,7 +18,7 @@ class TopPosition(BaseModel):
 class PortfolioShapshotResponse(BaseModel):
     portfolio_id: int=Field(..., description="portfolio ID")
     name: str=Field(..., description="portfolio name")
-    total_value: float=Field(..., description="total current value of portfolio")
+    market_value: float=Field(..., description="total current value of portfolio")
     unrealized_pnl: float=Field(..., description="unrealized PNL of portfolio")
     unrealized_return_pct: float=Field(..., description="unreleazed return of portfolio")
     cost_basis: float=Field(..., description="value invested in portfolio initially")
