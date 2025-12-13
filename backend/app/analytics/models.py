@@ -6,7 +6,7 @@ from typing import Deque, Literal
 @dataclass(frozen=True)
 class TradeDTO:
     asset_id: int
-    direction: Literal["buy", "sell"]
+    direction: str
     quantity: float
     price: float
 
@@ -26,9 +26,12 @@ class Lot:
     price: float
 
 @dataclass
-class AssetPosition:
+class SnapshotPositionAn:
     asset_id: int
     asset_market_price: float
+    ticker: str
+    name: str
+    sector: str
     lots: Deque[Lot] = field(default_factory=deque)
     
     @property
@@ -66,3 +69,8 @@ class AssetPosition:
     @property
     def market_price(self):
         return self.quantity * self.asset_market_price
+
+@dataclass
+class SectorPositionAn:
+    sector: str
+    market_value: float
