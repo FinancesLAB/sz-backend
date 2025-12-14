@@ -9,7 +9,7 @@ from app.schemas.analytics import (
     PortfolioShapshotResponse, 
     TopPosition, 
     SectorDistributionResponse, 
-    SectorPosition, 
+    SectorDistributionPosition, 
     PortfolioPrice, 
     PortfolioDynamicsResponse
     )
@@ -22,33 +22,39 @@ from app.analytics.analytics_calc import  (
     calc_market_value, 
     calc_unrealized_return_pct, 
     build_sector_positions,
-
-    build_dynamics_positions
+    build_dynamics_positions,
+    build_time_series
 )
 from datetime import datetime, timedelta
 from typing import Dict
 
-def get_timestamps_count_24h(ts_now: datetime) -> int:
-    ts_from = ts_now - timedelta(days=1)
-    count = int ((ts_now - ts_from).total_seconds() / 60 / 5)
-    return count
+# def get_timestamps_count_24h(ts_now: datetime) -> int:
+#     ts_from = ts_now - timedelta(days=1)
+#     count = int ((ts_now - ts_from).total_seconds() / 60 / 15)
+#     return count
 
-def get_sorted_timeseries_24h(ts_now: datetime, count: int):
-    time_series = []
-    for i in range(count):
-        ts = (ts_now - timedelta(minutes=5*i)).replace(second=0, microsecond=0)
-        time_series.append(ts)
-    time_series = sorted(time_series, reverse=False)
-    return time_series
+# def get_sorted_timeseries_24h(ts_now: datetime, count: int):
+#     time_series = []
+#     for i in range(count):
+#         ts = (ts_now - timedelta(minutes=i*15)).replace(second=0, microsecond=0)
+#         time_series.append(ts)
+#     time_series = sorted(time_series, reverse=False)
+#     return time_series
 
-def get_portfolio_price_by_ts(ts, asset_market_prices, asset_id_to_quantity: Dict[int, int]) -> float:
-    total_price = 0
-
-    for asset_price in asset_market_prices:
-        timestamp = asset_price.timestamp.replace(second=0, microsecond=0)
-        if timestamp == ts:
-            total_price += asset_price.price * asset_id_to_quantity[asset_price.asset_id]
-    return total_price
+# def build_time_series(timestamp_now, asset_prices, dynamic_positions):
+#     timestamps_count = get_timestamps_count_24h(ts_now=timestamp_now)
+#     time_series = get_sorted_timeseries_24h(ts_now=timestamp_now, count=timestamps_count)
+#     asset_id_to_quantity = {pos.asset_id : pos.quantity for pos in dynamic_positions}
+#     data = []
+#     for ts in time_series:
+#         total_price = int()
+#         for asset_price in asset_prices:
+#             timestamp = asset_price.timestamp.replace(second=0, microsecond=0)
+#             if timestamp == ts:
+#                 total_price += asset_price.price * asset_id_to_quantity[asset_price.asset_id]
+#         data.append(PortfolioPrice(timestamp=ts, total_value=total_price))
+#     return data
+        
 # убрать всю аналитику отсюлаёёда
 class AnalyticsService:
     def __init__(self, session: AsyncSession):
@@ -114,8 +120,8 @@ class AnalyticsService:
         sector_positions: List[SectorPosition] = build_sector_positions(trades=trade_dtos, current_prices=market_prices, assets=assets)
         portfolio_market_value = sum(pos.market_value for pos in sector_positions)
 
-        secs: List[SectorPosition] = [
-            SectorPosition(
+        secs: List[SectorDistributionPosition] = [
+            SectorDistributionPosition(
                 sector=pos.sector, 
                 market_value=pos.market_value, 
                 weight_percent=pos.market_value / portfolio_market_value * 100
@@ -129,42 +135,28 @@ class AnalyticsService:
             sectors=secs
         ) 
     
-    # надо переписать под новую архитектуру и обрабатывать гораздо проще
     async def portfolio_dynamics_for_24h(self, portfolio_id: int) -> PortfolioDynamicsResponse:
         portfolio = await self.portfolio_repo.get_by_id(portfolio_id)
-        if portfolio is None: raise HTTPException(404, "SZ portfolio not found")
         portfolio_trades = await self.trade_repo.get_trades_by_portfolio_id(portfolio_id)
-        if not portfolio_trades: return PortfolioDynamicsResponse.empty(portfolio)
-        asset_ids = {trade.asset_id for trade in portfolio_trades}
-        trade_dtos = [TradeDTO.from_orm(trade) for trade in portfolio_trades]
-        assets = await self.asset_repo.get_assets_by_ids(asset_ids)
-        asset_id_to_price = await self.asset_price_repo.get_prices_dict_by_ids(asset_ids)
-        positions: List[PortfolioPositionPrepared] = build_only_buy_positions(trades=trade_dtos, current_prices=asset_id_to_price, assets=assets)
-        asset_ids = [pos.asset_id for pos in positions]
         dynamic_positions = build_dynamics_positions(trades=portfolio_trades)
+        asset_ids = [pos.asset_id for pos in dynamic_positions]
         timestamp_now = datetime.utcnow()
-        asset_prices = await self.asset_price_repo.get_prices_since(ids=asset_ids, since=timestamp_now - timedelta(days=1) )
-        timestamps_count = get_timestamps_count_24h(ts_now=timestamp_now)
-        time_series = get_sorted_timeseries_24h(ts_now=timestamp_now, count=timestamps_count)
-        asset_id_to_quantity = {}
-        for pos in positions:
-            asset_id_to_quantity[pos.asset_id] = pos.quantity
-        data = []
-        for ts in time_series:
-            total_price = 0
-            for asset_price in asset_prices:
-                timestamp = asset_price.timestamp.replace(second=0, microsecond=0)
-                if timestamp == ts:
-                    total_price += asset_price.price * asset_id_to_quantity[asset_price.asset_id]
-            # total_price = get_portfolio_price_by_ts(ts=ts, asset_market_prices=asset_prices, asset_id_to_quantity=asset_id_to_quantity)
-            data.append(PortfolioPrice(timestamp=ts, total_value=total_price))
-        
+        # timestamp_now = datetime.fromisoformat('2025-12-14T14:20:00')
+        asset_prices_history = await self.asset_price_repo.get_prices_since(ids=asset_ids, since=timestamp_now - timedelta(days=1))
+
+        time_series = build_time_series(timestamp_now=timestamp_now, asset_prices=asset_prices_history, dynamic_positions=dynamic_positions)
+        prices = [
+            PortfolioPrice(
+                timestamp=serie.timestamp, 
+                total_value=serie.price
+                ) for serie in time_series
+            ]
         return PortfolioDynamicsResponse(
             portfolio_id=portfolio.id,
             name=portfolio.name,
-            data=data
+            data=prices
         )
 
 
 
-# insert into asset_prices (asset_id, price, currency, source, timestamp) values  (17, 234, 'RUB', 'moex', NOW());
+    
