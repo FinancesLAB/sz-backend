@@ -16,6 +16,10 @@ class UserService:
         if user is None:
             raise HTTPException(404, "SZ user not found")
         return user
+    
+    async def get_by_email(self, email: str):
+        user = await self.repo.get_by_email(email=email)
+        return user
 
     async def create(self, obj_in: UserCreate):
         return await self.repo.create(obj_in=obj_in)

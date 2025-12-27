@@ -24,6 +24,11 @@ class UserRepository:
         result = await self.session.execute(query)
         return result.scalar_one_or_none()
     
+    async def get_by_email(self, email: str):
+        query = select(User).where(User.email == email)
+        result = await self.session.execute(query)
+        return result.scalar_one_or_none()
+        
     async def update(self, user: User, obj_in: UserUpdate):
         update_data=obj_in.dict(exclude_unset=True)
         for field, value in update_data.items():
