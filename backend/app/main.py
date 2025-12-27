@@ -1,5 +1,5 @@
 from fastapi import FastAPI, APIRouter
-from app.api.routers import users, assets, portfolios, trades, analytics, auth
+from app.api.routers.adm import users, assets, portfolios, trades, analytics, auth
 from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 api_router = APIRouter(prefix="/api")

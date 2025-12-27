@@ -28,10 +28,3 @@ async def update_portfolio(portfolio_id: int, payload: PortfolioUpdate, service:
 @router.get("/admin/user/{user_id}") # add pydantic
 async def get_user_portfolios(user_id: int, service: PortfolioService=Depends(get_porfolio_service)):
     return await service.get_user_portfolios(user_id=user_id)
-
-from app.api.deps import get_current_user
-
-@router.get("/")
-async def get_all_portfolios(current_user=Depends(get_current_user), service: PortfolioService=Depends(get_porfolio_service)) -> list[PortfolioResponse]:
-    return await service.get_user_portfolios(user_id=current_user.id)
-
