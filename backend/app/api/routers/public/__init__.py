@@ -8,8 +8,8 @@ from .analytics import router as analytics_router
 routers = [
     auth_router,
     users_router,
-    # assets_router,
+    assets_router,
     portfolios_router,
-    # trades_router,
-    # analytics_router,
+    trades_router,
+    analytics_router,
 ]
