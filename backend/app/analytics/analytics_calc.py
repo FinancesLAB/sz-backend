@@ -1,9 +1,8 @@
 from collections import deque
-from typing import List
 from datetime import datetime, timedelta
 from app.analytics.models import PortfolioPositionPrepared, Lot, TradeDTO, SectorPosition, DynamicsPosition, TimeSerie
 
-def build_only_buy_positions(trades: List[TradeDTO], current_prices, assets) -> List[PortfolioPositionPrepared]:
+def build_only_buy_positions(trades: list[TradeDTO], current_prices, assets) -> list[PortfolioPositionPrepared]:
     id_to_lot = {}
     for t in trades:
 
@@ -66,7 +65,7 @@ def calc_unrealized_return_pct(unrealized_pnl: float, cost_basis: float):
 
 # SECTOR DISTRIBUTION
 
-def build_sector_positions(trades: List[TradeDTO], current_prices, assets) -> List[SectorPosition]:
+def build_sector_positions(trades: list[TradeDTO], current_prices, assets) -> list[SectorPosition]:
     portfolio_positions = build_only_buy_positions(trades=trades, current_prices=current_prices, assets=assets)
     sector_to_pos = {}
     for pos in portfolio_positions:
@@ -78,7 +77,7 @@ def build_sector_positions(trades: List[TradeDTO], current_prices, assets) -> Li
     return sector_to_pos.values()
 
 
-def build_dynamics_positions(trades: List[TradeDTO]):
+def build_dynamics_positions(trades: list[TradeDTO]):
     id_to_pos = dict()
 
     for trade in trades:

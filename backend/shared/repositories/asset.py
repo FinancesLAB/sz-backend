@@ -2,7 +2,6 @@ from sqlalchemy import select
 from shared.models.asset import Asset
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.asset import AssetCreateAdm, AssetUpdateAdm
-from typing import List, Dict
 class AssetRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
@@ -41,7 +40,7 @@ class AssetRepository:
         result = await self.session.execute(query)
         return result.scalar_one_or_none()
     
-    async def get_assets_by_ids(self, ids: List[int]) -> Dict[int, Asset]:
+    async def get_assets_by_ids(self, ids: list[int]) -> dict[int, Asset]:
         query = select(Asset).where(Asset.id.in_(ids))
         result = await self.session.execute(query)
         rows = result.scalars().all()

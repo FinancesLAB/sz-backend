@@ -1,4 +1,3 @@
-from typing import List, Dict
 from datetime import datetime, timedelta
 from shared.repositories.asset_price import AssetPriceRepository
 from shared.repositories.portfolio import PortfolioRepository
@@ -26,7 +25,6 @@ from app.analytics.analytics_calc import  (
     build_time_series
 )
 from datetime import datetime, timedelta
-from typing import Dict
 
 # убрать всю аналитику отсюлаёёда
 class AnalyticsService:
@@ -48,7 +46,7 @@ class AnalyticsService:
         trade_dtos = [TradeDTO.from_orm(trade) for trade in portfolio_trades]
 
         assets = await self.asset_repo.get_assets_by_ids(asset_ids)
-        portfolio_positions: List[PortfolioPositionPrepared] = build_only_buy_positions(trades=trade_dtos, current_prices=asset_market_prices, assets=assets)
+        portfolio_positions: list[PortfolioPositionPrepared] = build_only_buy_positions(trades=trade_dtos, current_prices=asset_market_prices, assets=assets)
         cost_basis = calc_cost_basis(asset_positive_positons=portfolio_positions)
         unrealized_pnl = calc_unrealized_pnl(asset_positive_positons=portfolio_positions)
         market_price = calc_market_value(asset_positive_positons=portfolio_positions)
@@ -92,7 +90,7 @@ class AnalyticsService:
         trade_dtos = [TradeDTO.from_orm(trade) for trade in portfolio_trades]
 
         assets = await self.asset_repo.get_assets_by_ids(asset_ids)
-        portfolio_positions: List[PortfolioPositionPrepared] = build_only_buy_positions(trades=trade_dtos, current_prices=asset_market_prices, assets=assets)
+        portfolio_positions: list[PortfolioPositionPrepared] = build_only_buy_positions(trades=trade_dtos, current_prices=asset_market_prices, assets=assets)
         cost_basis = calc_cost_basis(asset_positive_positons=portfolio_positions)
         unrealized_pnl = calc_unrealized_pnl(asset_positive_positons=portfolio_positions)
         market_price = calc_market_value(asset_positive_positons=portfolio_positions)
@@ -134,10 +132,10 @@ class AnalyticsService:
         market_prices = await self.asset_price_repo.get_prices_dict_by_ids(asset_ids)
         assets = await self.asset_repo.get_assets_by_ids(asset_ids)
         trade_dtos = [TradeDTO.from_orm(trade) for trade in portfolio_trades]
-        sector_positions: List[SectorPosition] = build_sector_positions(trades=trade_dtos, current_prices=market_prices, assets=assets)
+        sector_positions: list[SectorPosition] = build_sector_positions(trades=trade_dtos, current_prices=market_prices, assets=assets)
         portfolio_market_value = sum(pos.market_value for pos in sector_positions)
 
-        secs: List[SectorDistributionPosition] = [
+        secs: list[SectorDistributionPosition] = [
             SectorDistributionPosition(
                 sector=pos.sector, 
                 market_value=pos.market_value, 
@@ -163,10 +161,10 @@ class AnalyticsService:
         market_prices = await self.asset_price_repo.get_prices_dict_by_ids(asset_ids)
         assets = await self.asset_repo.get_assets_by_ids(asset_ids)
         trade_dtos = [TradeDTO.from_orm(trade) for trade in portfolio_trades]
-        sector_positions: List[SectorPosition] = build_sector_positions(trades=trade_dtos, current_prices=market_prices, assets=assets)
+        sector_positions: list[SectorPosition] = build_sector_positions(trades=trade_dtos, current_prices=market_prices, assets=assets)
         portfolio_market_value = sum(pos.market_value for pos in sector_positions)
 
-        secs: List[SectorDistributionPosition] = [
+        secs: list[SectorDistributionPosition] = [
             SectorDistributionPosition(
                 sector=pos.sector, 
                 market_value=pos.market_value, 
