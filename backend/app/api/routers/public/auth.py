@@ -25,7 +25,7 @@ async def register(payload: RegisterIn, service: UserService = Depends(get_user_
 async def login(form:  Annotated[OAuth2PasswordRequestForm, Depends()], service: UserService = Depends(get_user_service)) -> Token:
     user = await service.get_by_email(form.username)
     if not user or not verify_password(form.password, user.hashed_password):
-        raise HTTPException(status_code=400, detail="access troubles")
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
 
     token = create_access_token(user_id=str(user.id))
     return Token(access_token=token)

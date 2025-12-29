@@ -46,11 +46,11 @@ async def get_current_user(token: str = Depends(oauth2_scheme), service: UserSer
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("sub")
         if not user_id:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="ni")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     except JWTError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="nig")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
     user = await service.get_by_id(int(user_id))
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="nigg")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     return user
