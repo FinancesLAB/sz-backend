@@ -4,6 +4,7 @@ from app.services.assets import AssetService
 from app.services.trades import TradeService
 from app.services.portfolios import PortfolioService
 from app.services.analytics import AnalyticsService
+from app.services.refresh_session import RefreshSessionService
 from fastapi import Depends, HTTPException, status
 from app.core.database import get_session
 from app.core.config import settings
@@ -33,6 +34,11 @@ def get_analytics_service(
         session: AsyncSession=Depends(get_session)
 ) -> AnalyticsService:
     return AnalyticsService(session=session)
+
+def get_refresh_session_service(
+    session: AsyncSession=Depends(get_session)
+) -> RefreshSessionService:
+    return RefreshSessionService(session=session)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
