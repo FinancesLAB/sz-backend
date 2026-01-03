@@ -4,8 +4,12 @@ from app.services.assets import AssetService
 from app.services.trades import TradeService
 from app.services.portfolios import PortfolioService
 from app.services.analytics import AnalyticsService
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
 from app.core.database import get_session
+from app.core.config import settings
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from jose import jwt, JWTError
+
 
 def get_user_service(
         session: AsyncSession = Depends(get_session)
@@ -30,15 +34,7 @@ def get_analytics_service(
 ) -> AnalyticsService:
     return AnalyticsService(session=session)
 
-
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from fastapi import HTTPException
-from jose import jwt, JWTError
-from app.core.config import settings
-from fastapi import status
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
-
-from jose import JWTError
 
 async def get_current_user(token: str = Depends(oauth2_scheme), service: UserService = Depends(get_user_service)):
     try:
