@@ -27,7 +27,7 @@ from app.schemas.auth import RefreshIn, LogoutIn
 from app.core.security import hash_password, verify_password, create_access_token
 from app.schemas.user import UserResponsePublic, UserCreateAdm
 
-class RefreshSessionService:
+class AuthService:
       def __init__(self, session):
         self.session = session
         self.rs_repo = RefreshSessionRepository(session=session)
