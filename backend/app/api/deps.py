@@ -38,12 +38,19 @@ from app.core.config import settings
 from fastapi import status
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
+from jose import JWTError
+
 async def get_current_user(token: str = Depends(oauth2_scheme), service: UserService = Depends(get_user_service)):
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+
+        if payload.get("type") != "access": # чтобы точно на рефреше не получили ничего
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token type")
+
         user_id = payload.get("sub")
         if not user_id:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
