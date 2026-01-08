@@ -32,7 +32,6 @@ class AuthService:
         self.user_repo = UserRepository(session=session)
       
       
-      
     async def login(self, username: str, password: str):
         user = await self.user_repo.get_by_email(username)
     
@@ -40,7 +39,7 @@ class AuthService:
 
         access_token = create_access_token(user_id=user.id)
         refresh_jti = uuid4().hex
-        refresh_token = create_refresh_token(user_id=user.id,jti=refresh_jti)
+        refresh_token = create_refresh_token(user_id=user.id, jti=refresh_jti)
         refresh_expires_at = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
         
         await self.rs_repo.create(
@@ -51,10 +50,8 @@ class AuthService:
                 expires_at=refresh_expires_at,
             )
         )
-        
+
         return Token(access_token=access_token, refresh_token=refresh_token)
-      
-      
       
     async def refresh(self, payload: RefreshIn):
         try:
@@ -64,15 +61,13 @@ class AuthService:
         
         rs = await self.rs_repo.get_by_jti(jti=jti)
 
-        if not rs: raise HTTPException(status_code=401)
-        if rs.revoked_at is not None: 
-            raise HTTPException(status_code=401)
-        if rs.expires_at <= datetime.now(timezone.utc): 
-            raise HTTPException(status_code=401)
-        if rs.token_hash != hash_of_refresh_token(payload.refresh_token): 
-            raise HTTPException(status_code=401)
+        if (
+            not rs 
+            or rs.revoked_at is not None
+            or rs.expires_at <= datetime.now(timezone.utc)
+            or rs.token_hash != hash_of_refresh_token(payload.refresh_token)
+        ): raise HTTPException(status_code=401)
         
-
         rs.revoked_at = datetime.now(timezone.utc)
         
         new_jti = uuid4().hex
@@ -96,8 +91,6 @@ class AuthService:
 
         return Token(access_token=access_token, refresh_token=new_refresh_token)
         
-        
-        
     async def logout(self, payload: LogoutIn):
         try: 
             jti = get_jti_from_token(token=payload.refresh_token)
@@ -106,11 +99,15 @@ class AuthService:
         
         await self.rs_repo.set_revoke_by_jti(jti=jti)
         
-        
-        
-        
     async def register(self, payload: RegisterIn):
         existing = await self.user_repo.get_by_email(payload.email)
-        if existing: raise HTTPException(status_code=409, detail="User already exists")
-        user = await self.user_repo.create(UserCreateAdm(name=payload.name, email=payload.email, hashed_password=hash_password(payload.password),))
+        if existing: 
+            raise HTTPException(status_code=409, detail="User already exists")
+        user = await self.user_repo.create(
+            UserCreateAdm(
+                name=payload.name, 
+                email=payload.email, 
+                hashed_password=hash_password(payload.password),
+                )
+            )
         return UserResponsePublic(name=user.name, email=user.email)        

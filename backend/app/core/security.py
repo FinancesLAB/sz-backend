@@ -43,6 +43,7 @@ def get_jti_from_token(token: str):
 class InvalidRefreshToken(Exception):
     pass
 
+
 def decode_refresh_token(token: str) -> tuple[int, str]:
     try:
         decoded = jwt.decode(
