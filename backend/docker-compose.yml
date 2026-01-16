@@ -17,6 +17,18 @@ services:
       timeout: 3s
       retries: 20
 
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+      
   backend:
     build:
       context: .
@@ -25,6 +37,8 @@ services:
     restart: always
     depends_on:
       db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     environment:
       POSTGRES_HOST: db
@@ -37,10 +51,14 @@ services:
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
       REFRESH_TOKEN_EXPIRE_DAYS: ${REFRESH_TOKEN_EXPIRE_DAYS}
       ALGORITHM: ${ALGORITHM}
-      REDIS_URL: ${REDIS_URL}
+      REDIS_URL: redis://redis:6379/0
       REDIS_PRICES_CHANNEL: ${REDIS_PRICES_CHANNEL}
     ports:
       - "8000:8000"
+  
+  
 
+    
+      
 volumes:
   postgres_data:
