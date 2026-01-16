@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.routers.public import routers as public_routers
 from app.api.routers.adm import routers as admin_routers
 from app.core.config import settings
-from app.ws.ws import ws_manager
+from app.ws.manager import ws_manager
 
 app = FastAPI()
 
