@@ -5,7 +5,7 @@ from shared.repositories.asset import AssetRepository
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 from app.schemas.analytics import (
-    PortfolioShapshotResponse, 
+    PortfolioSnapshotResponse, 
     TopPosition, 
     SectorDistributionResponse, 
     SectorDistributionPosition, 
@@ -35,12 +35,12 @@ class AnalyticsService:
         self.asset_repo=AssetRepository(session=session)
         self.trade_repo=TradeRepository(session=session)
 
-    async def portfolio_snapshot(self, portfolio_id: int) -> PortfolioShapshotResponse:
+    async def portfolio_snapshot(self, portfolio_id: int) -> PortfolioSnapshotResponse:
         portfolio = await self.portfolio_repo.get_by_id(portfolio_id)
         if portfolio is None: raise HTTPException(404, "SZ portfolio not found")
         portfolio_trades = await self.trade_repo.get_trades_by_portfolio_id(portfolio_id)
         if not portfolio_trades:
-            return PortfolioShapshotResponse.empty(portfolio)
+            return PortfolioSnapshotResponse.empty(portfolio)
         asset_ids = {trade.asset_id for trade in portfolio_trades}
         asset_market_prices = await self.asset_price_repo.get_prices_dict_by_ids(asset_ids)
         trade_dtos = [TradeDTO.from_orm(trade) for trade in portfolio_trades]
@@ -66,7 +66,7 @@ class AnalyticsService:
                 ) for pos in sorted(portfolio_positions, key=lambda pos: pos.market_price / market_price * 100, reverse=True)[:5]
         ]
 
-        return PortfolioShapshotResponse(
+        return PortfolioSnapshotResponse(
             portfolio_id=portfolio.id,
             name=portfolio.name,
             market_value=market_price,
@@ -78,13 +78,13 @@ class AnalyticsService:
             top_positions=top_positions
         )
 
-    async def portfolio_snapshot_for_user(self, portfolio_id: int, user_id: int) -> PortfolioShapshotResponse:
+    async def portfolio_snapshot_for_user(self, portfolio_id: int, user_id: int) -> PortfolioSnapshotResponse:
         portfolio = await self.portfolio_repo.get_by_id(portfolio_id)
         if portfolio is None: raise HTTPException(404, "SZ portfolio not found")
         if portfolio.user_id != user_id: raise HTTPException(404, "SZ portfolio not found")
         portfolio_trades = await self.trade_repo.get_trades_by_portfolio_id(portfolio_id)
         if not portfolio_trades:
-            return PortfolioShapshotResponse.empty(portfolio)
+            return PortfolioSnapshotResponse.empty(portfolio)
         asset_ids = {trade.asset_id for trade in portfolio_trades}
         asset_market_prices = await self.asset_price_repo.get_prices_dict_by_ids(asset_ids)
         trade_dtos = [TradeDTO.from_orm(trade) for trade in portfolio_trades]
@@ -110,7 +110,7 @@ class AnalyticsService:
                 ) for pos in sorted(portfolio_positions, key=lambda pos: pos.market_price / market_price * 100, reverse=True)[:5]
         ]
 
-        return PortfolioShapshotResponse(
+        return PortfolioSnapshotResponse(
             portfolio_id=portfolio.id,
             name=portfolio.name,
             market_value=market_price,
