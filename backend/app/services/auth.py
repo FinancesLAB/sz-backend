@@ -41,9 +41,7 @@ class AuthService:
         access_token = create_access_token(user_id=user.id)
         refresh_jti = uuid4().hex
         refresh_token = create_refresh_token(user_id=user.id, jti=refresh_jti)
-        refresh_expires_at = datetime.now(UTC) + timedelta(
-            days=settings.REFRESH_TOKEN_EXPIRE_DAYS
-        )
+        refresh_expires_at = datetime.now(UTC) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
 
         await self.rs_repo.create(
             RefreshSessionCreate(

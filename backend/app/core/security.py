@@ -17,9 +17,7 @@ def verify_password(password: str, hashed: str) -> bool:
 
 
 def create_access_token(user_id: int) -> str:
-    expirates_at = datetime.now(UTC) + timedelta(
-        minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-    )
+    expirates_at = datetime.now(UTC) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     payload = {
         "sub": str(user_id),
         "type": "access",
