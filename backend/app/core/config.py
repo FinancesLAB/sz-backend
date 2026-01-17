@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 
+
 class Settings(BaseSettings):
     DATABASE_URL: str
 
@@ -7,11 +8,12 @@ class Settings(BaseSettings):
     ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
     REFRESH_TOKEN_EXPIRE_DAYS: int
-    REDIS_URL: str 
+    REDIS_URL: str
     REDIS_PRICES_CHANNEL: str
-    
+
     class Config:
         env_file = ".env"
         extra = "ignore"
+
 
 settings = Settings()

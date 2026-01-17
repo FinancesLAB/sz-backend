@@ -8,46 +8,54 @@ from app.services.auth import AuthService
 from fastapi import Depends, HTTPException, status
 from app.core.database import get_session
 from app.core.config import settings
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 
 
-def get_user_service(
-        session: AsyncSession = Depends(get_session)
-) -> UserService:
+def get_user_service(session: AsyncSession = Depends(get_session)) -> UserService:
     return UserService(session=session)
 
-def get_portfolio_service(session: AsyncSession = Depends(get_session)) -> PortfolioService:
+
+def get_portfolio_service(
+    session: AsyncSession = Depends(get_session),
+) -> PortfolioService:
     return PortfolioService(session=session)
 
-def get_trade_service(
-        session: AsyncSession = Depends(get_session)
-) -> TradeService:
+
+def get_trade_service(session: AsyncSession = Depends(get_session)) -> TradeService:
     return TradeService(session=session)
 
-def get_asset_service(
-        session: AsyncSession=Depends(get_session)
-) -> AssetService:
+
+def get_asset_service(session: AsyncSession = Depends(get_session)) -> AssetService:
     return AssetService(session=session)
 
+
 def get_analytics_service(
-        session: AsyncSession=Depends(get_session)
+    session: AsyncSession = Depends(get_session),
 ) -> AnalyticsService:
     return AnalyticsService(session=session)
 
-def get_auth_service(
-    session: AsyncSession=Depends(get_session)
-) -> AuthService:
+
+def get_auth_service(session: AsyncSession = Depends(get_session)) -> AuthService:
     return AuthService(session=session)
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
-async def get_current_user(token: str = Depends(oauth2_scheme), service: UserService = Depends(get_user_service)):
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
 
-        if payload.get("type") != "access": # чтобы точно на рефреше не получили ничего
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token type")
+async def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    service: UserService = Depends(get_user_service),
+):
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
+
+        if payload.get("type") != "access":  # чтобы точно на рефреше не получили ничего
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token type"
+            )
 
         user_id = payload.get("sub")
         if not user_id:

@@ -12,13 +12,13 @@ from app.ws.redis_listener import redis_prices_listener
 app = FastAPI()
 
 
-
 @app.on_event("startup")
 async def on_startup() -> None:
     app.state.redis = create_redis()
     app.state.redis_prices_task = asyncio.create_task(
         redis_prices_listener(app.state.redis)
     )
+
 
 @app.on_event("shutdown")
 async def on_shutdown() -> None:
@@ -33,6 +33,7 @@ async def on_shutdown() -> None:
     r = getattr(app.state, "redis", None)
     if r is not None:
         await close_redis(r)
+
 
 api_router = APIRouter(prefix="/api")
 
@@ -53,9 +54,9 @@ api_router.include_router(router=ws_router)
 
 for r in public_routers:
     api_router.include_router(r)
-    
+
 
 # for r in admin_routers:
 #     api_router.include_router(r)
-    
+
 app.include_router(api_router)

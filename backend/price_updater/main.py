@@ -9,6 +9,7 @@ from price_updater.services.service import PricesService
 
 asset_registry = AssetRegistry()
 
+
 async def reload_assets():
     """Обновление списка активов каждые N минут."""
     async with async_session_maker() as session:

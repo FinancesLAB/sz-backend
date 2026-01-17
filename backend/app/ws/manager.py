@@ -1,5 +1,6 @@
 from fastapi import WebSocket
 
+
 class WSManager:
     def __init__(self):
         self._clients: set[WebSocket] = set()
@@ -20,7 +21,8 @@ class WSManager:
                 dead.append(ws)
         for ws in dead:
             self.disconnect(ws)
-            
+
+
 ws_manager = WSManager()
 
 # websocat ws://localhost:8000/ws/prices

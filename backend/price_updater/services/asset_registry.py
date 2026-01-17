@@ -1,6 +1,8 @@
 from sqlalchemy import select
 from loguru import logger
 from shared.repositories.asset import AssetRepository
+
+
 class AssetRegistry:
     def __init__(self):
         self.assets: dict[int, str] = {}

@@ -1,11 +1,13 @@
 import aiohttp
 from loguru import logger
 
+
 class MoexClient:
-    
     @staticmethod
     async def get_all_prices() -> dict:
-        async with aiohttp.ClientSession(connector=aiohttp.connector.TCPConnector(ssl=False)) as session:
+        async with aiohttp.ClientSession(
+            connector=aiohttp.connector.TCPConnector(ssl=False)
+        ) as session:
             url = f"https://iss.moex.com/iss/engines/stock/markets/shares/securities.json?marketdata.columns=SECID,LAST"
             try:
                 async with session.get(url, timeout=30) as resp:
@@ -22,12 +24,5 @@ class MoexClient:
                 logger.error(f" !!!!!!! Ошибка парсинга ответа: {data} !!!!!!!")
                 raise
 
-
-
-
-
-
-
     async def get_security_info(self, ticker: str) -> dict:
         pass
-

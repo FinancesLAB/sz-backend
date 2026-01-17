@@ -3,6 +3,7 @@ import redis.asyncio as redis
 from app.core.config import settings
 from app.ws.manager import ws_manager
 
+
 async def redis_prices_listener(r: redis.Redis) -> None:
     pubsub = r.pubsub()
     await pubsub.subscribe(settings.REDIS_PRICES_CHANNEL)
