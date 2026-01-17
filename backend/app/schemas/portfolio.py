@@ -20,7 +20,7 @@ PortfolioName = Annotated[
         description="Portfolio name",
         min_length=1,
         max_length=64,
-        examples=["Main portfolio", "Long-term"],
+        examples=["Main portfolio"],
     ),
 ]
 
