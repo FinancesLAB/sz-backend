@@ -57,8 +57,8 @@ class AuthService:
     async def refresh(self, payload: RefreshIn):
         try:
             user_id, jti = decode_refresh_token(token=payload.refresh_token)
-        except InvalidRefreshToken:
-            raise HTTPException(status_code=401)
+        except InvalidRefreshToken as err:
+            raise HTTPException(status_code=401) from err
 
         rs = await self.rs_repo.get_by_jti(jti=jti)
 

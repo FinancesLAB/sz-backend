@@ -60,8 +60,8 @@ async def get_current_user(
         if not user_id:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
-    except JWTError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    except JWTError as err:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED) from err
 
     user = await service.get_by_id(int(user_id))
     if not user:

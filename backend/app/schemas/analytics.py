@@ -77,7 +77,10 @@ class SectorDistributionPosition(APIModel):
     )
     weight_percent: Percent = Field(
         ...,
-        description="Current percent value of portfolio assets from stated sector to whole current portfolio value",
+        description=(
+        "Current percent value of portfolio assets from stated sector "
+        "to whole current portfolio value"
+    ),
     )
 
 

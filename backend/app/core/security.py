@@ -59,8 +59,8 @@ def decode_refresh_token(token: str) -> tuple[int, str]:
             settings.SECRET_KEY,
             algorithms=[settings.ALGORITHM],
         )
-    except JWTError:
-        raise InvalidRefreshToken()
+    except JWTError as err:
+        raise InvalidRefreshToken() from err
 
     if decoded.get("type") != "refresh":
         raise InvalidRefreshToken()
