@@ -38,14 +38,16 @@ docker compose --env-file .env.example up -d --build
 # Используемые технологии и инструменты
 •	Python 3.13
 •	FastAPI
+•   WebSocket
 •	Pydantic
 •	aiohttp
+•   asyncio
 •	PostgreSQL
 •	SQLAlchemy 2.0 (async)
 •	Alembic
 •	Redis
 •	Logging + settings management интеграция с API iss.moex
-•   oauth2
+•   Auth JWT (Access/Refresh)
 
 # В планах: 
 - custom exceptions
