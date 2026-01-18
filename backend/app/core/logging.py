@@ -1,15 +1,8 @@
 import logging
 import sys
 import uuid
-from contextvars import ContextVar
 
 import structlog
-
-_request_id_ctx: ContextVar[str | None] = ContextVar("request_id", default=None)
-
-
-def set_request_id(value: str | None) -> None:
-    _request_id_ctx.set(value)
 
 
 def new_request_id() -> str:

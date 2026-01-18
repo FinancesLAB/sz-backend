@@ -2,18 +2,18 @@ import time
 from collections.abc import Callable
 
 import structlog
-from app.core.logging import (
-    new_request_id,
-    set_request_id,
-)
+from app.core.logging import new_request_id
 from fastapi import Request, Response
+from structlog.contextvars import bind_contextvars, clear_contextvars
 
 log = structlog.get_logger("http")
 
 
 async def request_logging_middleware(request: Request, call_next: Callable) -> Response:
-    rid = new_request_id()
-    set_request_id(rid)
+    rid = request.headers.get("x-request-id") or new_request_id()
+
+    clear_contextvars()
+    bind_contextvars(request_id=rid)
 
     started = time.perf_counter()
     try:
@@ -22,7 +22,6 @@ async def request_logging_middleware(request: Request, call_next: Callable) -> R
 
         log.info(
             "request",
-            request_id=rid,
             method=request.method,
             path=request.url.path,
             status_code=response.status_code,
@@ -35,9 +34,10 @@ async def request_logging_middleware(request: Request, call_next: Callable) -> R
         elapsed_ms = (time.perf_counter() - started) * 1000
         log.exception(
             "unhandled_exception",
-            request_id=rid,
             method=request.method,
             path=request.url.path,
             duration_ms=round(elapsed_ms, 2),
         )
         raise
+    finally:
+        clear_contextvars()
