@@ -14,5 +14,5 @@ class Trade(Base):
     direction: Mapped[str] = mapped_column(Text)  # buy/sell
     quantity: Mapped[float] = mapped_column(Numeric, nullable=False)
     price: Mapped[float] = mapped_column(Numeric, nullable=False)
-    trade_time: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    trade_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
