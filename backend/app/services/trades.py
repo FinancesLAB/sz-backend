@@ -1,13 +1,11 @@
+from app.contracts.repos import TradeRepo
 from app.schemas.trade import TradeCreate, TradeUpdate
 from fastapi import HTTPException
-from shared.repositories.trade import TradeRepository
-from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class TradeService:
-    def __init__(self, session: AsyncSession):
-        self.session = session
-        self.repo = TradeRepository(session=session)
+    def __init__(self, repo: TradeRepo):
+        self.repo = repo
 
     async def get_all_trades(self):
         return await self.repo.get_all()
