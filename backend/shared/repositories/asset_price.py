@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 
 from app.schemas.asset_price import AssetPriceCreate
 from shared.models.asset_price import AssetPrice
@@ -34,7 +35,7 @@ class AssetPriceRepository:
         prices = await self.session.execute(query)
         return prices.scalars().all()
 
-    async def get_last_price_by_id(self, asset_id: int) -> float | None:
+    async def get_last_price_by_id(self, asset_id: int) -> Decimal | None:
         query = (
             select(AssetPrice.price)
             .where(AssetPrice.asset_id == asset_id)
@@ -44,7 +45,7 @@ class AssetPriceRepository:
         result = await self.session.execute(query)
         return result.scalar_one_or_none()
 
-    async def get_prices_dict_by_ids(self, asset_ids: list[int]) -> dict[int, float]:
+    async def get_prices_dict_by_ids(self, asset_ids: list[int]) -> dict[int, Decimal]:
         query = (
             select(AssetPrice.asset_id, AssetPrice.price)
             .distinct(AssetPrice.asset_id)

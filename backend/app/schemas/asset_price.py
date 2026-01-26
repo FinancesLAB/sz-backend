@@ -1,10 +1,12 @@
+from decimal import Decimal
+
 from pydantic import BaseModel
 from pydantic.types import AwareDatetime
 
 
 class AssetPriceBase(BaseModel):
     asset_id: int
-    price: float
+    price: Decimal
     currency: str
     source: str
 
@@ -15,7 +17,7 @@ class AssetPriceCreate(AssetPriceBase):
 
 class AssetPriceUpdate(AssetPriceBase):
     asset_id: int | None = None
-    price: float | None = None
+    price: Decimal | None = None
     currency: str | None = None
     source: str | None = None
 

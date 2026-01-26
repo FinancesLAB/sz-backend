@@ -1,14 +1,15 @@
 from collections import deque
 from dataclasses import dataclass, field
 from datetime import datetime
+from decimal import Decimal
 
 
 @dataclass(frozen=True)
 class TradeDTO:
     asset_id: int
     direction: str
-    quantity: float
-    price: float
+    quantity: Decimal
+    price: Decimal
 
     @classmethod
     def from_orm(cls, trade):
@@ -22,14 +23,14 @@ class TradeDTO:
 
 @dataclass
 class Lot:
-    qty: int
-    price: float
+    qty: Decimal
+    price: Decimal
 
 
 @dataclass
 class PortfolioPositionPrepared:
     asset_id: int
-    asset_market_price: float
+    asset_market_price: Decimal
     ticker: str
     name: str
     sector: str
@@ -37,8 +38,8 @@ class PortfolioPositionPrepared:
 
     @property
     def mid_price(self):
-        total = 0
-        qty = 0
+        total = Decimal(0)
+        qty = Decimal(0)
         for lot in self.lots:
             total += lot.qty * lot.price
             qty += lot.qty
@@ -46,14 +47,14 @@ class PortfolioPositionPrepared:
 
     @property
     def quantity(self):
-        qty = 0
+        qty = Decimal(0)
         for lot in self.lots:
             qty += lot.qty
         return qty
 
     @property
     def cost_basis(self):
-        cost_basis = 0
+        cost_basis = Decimal(0)
         for lot in self.lots:
             cost_basis += lot.qty * lot.price
         return cost_basis
@@ -75,16 +76,16 @@ class PortfolioPositionPrepared:
 @dataclass
 class SectorPosition:
     sector: str
-    market_value: float
+    market_value: Decimal
 
 
 @dataclass
 class DynamicsPosition:
     asset_id: int
-    quantity: int
+    quantity: Decimal
 
 
 @dataclass
 class TimeSerie:
     timestamp: datetime
-    price: float
+    price: Decimal

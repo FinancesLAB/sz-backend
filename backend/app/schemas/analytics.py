@@ -1,3 +1,4 @@
+from decimal import Decimal
 from enum import Enum
 from typing import Annotated
 
@@ -6,7 +7,11 @@ from pydantic.types import AwareDatetime, NonNegativeInt, PositiveInt
 
 
 class APIModel(BaseModel):
-    model_config = ConfigDict(extra='forbid', str_strip_whitespace=True)
+    model_config = ConfigDict(
+        extra='forbid',
+        str_strip_whitespace=True,
+        json_encoders={Decimal: lambda v: str(v)},
+    )
 
 
 class Currency(str, Enum):
@@ -15,12 +20,12 @@ class Currency(str, Enum):
 
 
 Money = Annotated[
-    float,
+    Decimal,
     Field(description='Money value', ge=0),
 ]
 
 Percent = Annotated[
-    float,
+    Decimal,
     Field(description='Percent value', ge=-100, le=10_000),
 ]
 
@@ -29,13 +34,13 @@ class TopPosition(APIModel):
     asset_id: PositiveInt = Field(..., description='Asset ID in position')
     ticker: str = Field(..., description='Asset ticker, for example: GAZP')
     full_name: str = Field(..., description='Full name of asset in position')
-    quantity: NonNegativeInt = Field(..., description='Quantity of asset in position')
+    quantity: Decimal = Field(..., description='Quantity of asset in position')
     avg_buy_price: Money = Field(..., description='Average buy price of asset in position')
     asset_market_price: Money = Field(
         ..., description='Current market price of 1 asset in position'
     )
     market_value: Money = Field(..., description='Current market price of all assets in position')
-    unrealized_pnl: float = Field(..., description='Unrealized PNL of portfolio position')
+    unrealized_pnl: Decimal = Field(..., description='Unrealized PNL of portfolio position')
     unrealized_return_pct: Percent = Field(..., description='Profit of asset in percents')
     weight_pct: Percent = Field(..., description='Weight of asset in portfolio in percents')
 
@@ -44,7 +49,7 @@ class PortfolioSnapshotResponse(APIModel):
     portfolio_id: PositiveInt = Field(..., description='Portfolio ID')
     name: str = Field(..., description='Portfolio name')
     market_value: Money = Field(..., description='Total current value of portfolio')
-    unrealized_pnl: float = Field(..., description='Unrealized PNL of portfolio')
+    unrealized_pnl: Decimal = Field(..., description='Unrealized PNL of portfolio')
     unrealized_return_pct: Percent = Field(..., description='Unrelized return of portfolio')
     cost_basis: Money = Field(..., description='Value invested in portfolio initially')
     currency: Currency = Field(..., description='Currency of portfolio, for example: RUB')
@@ -60,10 +65,10 @@ class PortfolioSnapshotResponse(APIModel):
         return cls(
             portfolio_id=portfolio.id,
             name=portfolio.name,
-            market_value=0,
-            unrealized_pnl=0,
-            unrealized_return_pct=0,
-            cost_basis=0,
+            market_value=Decimal(0),
+            unrealized_pnl=Decimal(0),
+            unrealized_return_pct=Decimal(0),
+            cost_basis=Decimal(0),
             currency=portfolio.currency,
             positions_count=0,
             top_positions=[],

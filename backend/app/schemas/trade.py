@@ -1,3 +1,4 @@
+from decimal import Decimal
 from enum import Enum
 from typing import Annotated
 
@@ -10,6 +11,7 @@ class APIModel(BaseModel):
         extra='forbid',
         str_strip_whitespace=True,
         from_attributes=True,
+        json_encoders={Decimal: lambda v: str(v)},
     )
 
 
@@ -19,7 +21,7 @@ class TradeDirection(str, Enum):
 
 
 Money = Annotated[
-    float,
+    Decimal,
     Field(description='Money value', ge=0),
 ]
 
@@ -28,7 +30,7 @@ class TradeBase(APIModel):
     portfolio_id: PositiveInt = Field(..., description='Portfolio id')
     asset_id: PositiveInt = Field(..., description='Asset id')
     direction: TradeDirection = Field(..., description='Trade direction, buy or sell')
-    quantity: PositiveInt = Field(..., description='Quantity of asset in this trade')
+    quantity: Decimal = Field(..., description='Quantity of asset in this trade')
     price: Money = Field(..., description='Price of 1 asset at the moment of trade')
     trade_time: AwareDatetime = Field(
         ..., description='Datetime timestamp with timezone when the trade created'
@@ -43,7 +45,7 @@ class TradeUpdate(APIModel):
     portfolio_id: PositiveInt | None = Field(None, description='Portfolio id')
     asset_id: PositiveInt | None = Field(None, description='Asset id')
     direction: TradeDirection | None = Field(None, description='Trade direction, buy or sell')
-    quantity: PositiveInt | None = Field(None, description='Quantity of asset in this trade')
+    quantity: Decimal | None = Field(None, description='Quantity of asset in this trade')
     price: Money | None = Field(None, description='Price of 1 asset at the moment of trade')
     trade_time: AwareDatetime | None = Field(
         None, description='Datetime timestamp with timezone when the trade created'

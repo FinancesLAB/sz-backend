@@ -1,5 +1,6 @@
 from collections import deque
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 from app.analytics.models import (
     DynamicsPosition,
@@ -61,29 +62,29 @@ def build_only_buy_positions(
 # PORTFOLIO SNAPSHOT
 
 
-def calc_unrealized_pnl(asset_positive_positons) -> float:
-    absolute_profit = 0
+def calc_unrealized_pnl(asset_positive_positons) -> Decimal:
+    absolute_profit = Decimal(0)
     for pos in asset_positive_positons:
         ap = pos.market_price - pos.mid_price * pos.quantity
         absolute_profit += ap
     return absolute_profit
 
 
-def calc_cost_basis(asset_positive_positons) -> float:
-    total_cost_basis = 0
+def calc_cost_basis(asset_positive_positons) -> Decimal:
+    total_cost_basis = Decimal(0)
     for trade in asset_positive_positons:
         total_cost_basis += trade.cost_basis
     return total_cost_basis
 
 
 def calc_market_value(asset_positive_positons):
-    current_value = 0
+    current_value = Decimal(0)
     for pos in asset_positive_positons:
         current_value += pos.market_price
     return current_value
 
 
-def calc_unrealized_return_pct(unrealized_pnl: float, cost_basis: float):
+def calc_unrealized_return_pct(unrealized_pnl: Decimal, cost_basis: Decimal):
     return (unrealized_pnl / cost_basis) * 100
 
 
@@ -97,7 +98,7 @@ def build_sector_positions(trades: list[TradeDTO], current_prices, assets) -> li
     sector_to_pos = {}
     for pos in portfolio_positions:
         if pos.sector not in sector_to_pos:
-            sector_to_pos[pos.sector] = SectorPosition(sector=pos.sector, market_value=0)
+            sector_to_pos[pos.sector] = SectorPosition(sector=pos.sector, market_value=Decimal(0))
 
         sector_to_pos[pos.sector].market_value = pos.market_price
 
@@ -109,7 +110,9 @@ def build_dynamics_positions(trades: list[TradeDTO]):
 
     for trade in trades:
         if trade.asset_id not in id_to_pos:
-            id_to_pos[trade.asset_id] = DynamicsPosition(asset_id=trade.asset_id, quantity=0)
+            id_to_pos[trade.asset_id] = DynamicsPosition(
+                asset_id=trade.asset_id, quantity=Decimal(0)
+            )
         if trade.direction == 'buy':
             id_to_pos[trade.asset_id].quantity += trade.quantity
         elif trade.direction == 'sell':

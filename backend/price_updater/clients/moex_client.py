@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import aiohttp
 from price_updater.clients.exceptions import (
     MoexError,
@@ -28,7 +30,7 @@ class MoexClient:
         if self._session and not self._session.closed:
             await self._session.close()
 
-    async def get_all_prices(self) -> dict[str, float]:
+    async def get_all_prices(self) -> dict[str, Decimal]:
         if not self._session or self._session.closed:
             raise MoexSessionNotOpened('You forgot to call MoexClient aopen()')
         try:
@@ -48,11 +50,11 @@ class MoexClient:
         except Exception as e:
             raise MoexParseError('Unexpected MOEX response schema') from e
 
-        prices: dict[str, float] = {}
+        prices: dict[str, Decimal] = {}
         for secid, last in rows:
             if last is None:
                 continue
-            prices[secid] = float(last)
+            prices[secid] = Decimal(str(last))
 
         return prices
 
