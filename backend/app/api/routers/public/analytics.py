@@ -11,7 +11,9 @@ router = APIRouter(prefix='/analytics', tags=['Analytics'])
 
 
 @router.get(
-    '/{portfolio_id}/snapshot', response_model=PortfolioSnapshotResponse
+    '/{portfolio_id}/snapshot',
+    response_model=PortfolioSnapshotResponse,
+    summary='Актуальная сводка информации + 3 топ позиции по портфелю.',
 )  # допилить чтобы аналитика давала (или в ручке) список снэпшотов по всем портфолио
 async def get_portfolio_snapshot_for_user(
     portfolio_id: int,
@@ -23,7 +25,11 @@ async def get_portfolio_snapshot_for_user(
     )
 
 
-@router.get('/{portfolio_id}/sectors', response_model=SectorDistributionResponse)
+@router.get(
+    '/{portfolio_id}/sectors',
+    response_model=SectorDistributionResponse,
+    summary="Распределение портфеля по секторам."
+)
 async def get_portfolio_sectors_distribution_for_user(
     portfolio_id: int,
     current_user=Depends(get_current_user),
@@ -34,7 +40,11 @@ async def get_portfolio_sectors_distribution_for_user(
     )
 
 
-@router.get('/{portfolio_id}/dynamics/24h', response_model=PortfolioDynamicsResponse)
+@router.get(
+    '/{portfolio_id}/dynamics/24h',
+    response_model=PortfolioDynamicsResponse,
+    summary="Динамика портфеля за последние 24 часа"
+)
 async def get_portfolio_dynamics_for_user(
     portfolio_id: int,
     current_user=Depends(get_current_user),
