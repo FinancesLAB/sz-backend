@@ -4,7 +4,7 @@ from collections.abc import AsyncIterator
 import pytest
 from alembic import command
 from alembic.config import Config
-from app.core.database import get_session
+from app.infrastructure.db import get_session
 from app.main import app
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import (
@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import (
 
 
 def _test_db_url() -> str:
-    return os.environ['TEST_DATABASE_URL']  # теперь обязательно задаём для Alembic
+    return os.environ['TEST_DATABASE_URL']
 
 
 def _alembic_config() -> Config:
