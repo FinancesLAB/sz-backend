@@ -12,7 +12,11 @@ from fastapi import APIRouter, Depends, status
 router = APIRouter(prefix='/portfolios', tags=['Portfolios'])
 
 
-@router.get('/', response_model=list[PortfolioResponseAdm])  # todo
+@router.get(
+    '/',
+    response_model=list[PortfolioResponseAdm],
+    summary='Список всех портфелей пользователя.',
+)  # todo
 async def get_portfolios(
     current_user=Depends(get_current_user),
     service: PortfolioService = Depends(get_portfolio_service),
@@ -20,7 +24,11 @@ async def get_portfolios(
     return await service.get_user_portfolios(user_id=current_user.id)
 
 
-@router.get('/{portfolio_id}', response_model=PortfolioResponseAdm)
+@router.get(
+    '/{portfolio_id}',
+    response_model=PortfolioResponseAdm,
+    summary='Портфель по id.',
+)
 async def get_by_portfolio_id(
     portfolio_id: int,
     current_user=Depends(get_current_user),
@@ -41,7 +49,11 @@ async def get_by_portfolio_id(
     return dto
 
 
-@router.delete('/{portfolio_id}', status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    '/{portfolio_id}',
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary='Удалить портфель по id.',
+)
 async def delete_by_id(
     portfolio_id: int,
     current_user=Depends(get_current_user),
@@ -51,7 +63,11 @@ async def delete_by_id(
     return None
 
 
-@router.post('/', response_model=PortfolioResponseAdm)  # todo
+@router.post(
+    '/',
+    response_model=PortfolioResponseAdm,
+    summary='Создать пустой портфель.',
+)  # todo
 async def create_portfolio_for_user(
     payload: PortfolioCreatePublic,
     current_user=Depends(get_current_user),
@@ -60,7 +76,11 @@ async def create_portfolio_for_user(
     return await service.create_portfolio_for_user(payload=payload, user_id=current_user.id)
 
 
-@router.patch('/{portfolio_id}', response_model=PortfolioResponseAdm)
+@router.patch(
+    '/{portfolio_id}',
+    response_model=PortfolioResponseAdm,
+    summary='Обновить информацию о портфеле.',
+)
 async def update_portfolio_for_user(
     portfolio_id: int,
     payload: PortfolioUpdatePublic,
