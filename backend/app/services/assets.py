@@ -1,6 +1,6 @@
 from app.schemas.asset import AssetCreateAdm, AssetUpdateAdm
 from fastapi import HTTPException
-from shared.repositories.asset import AssetRepositoryPostgres
+from app.repositories import AssetRepositoryPostgres
 from sqlalchemy.ext.asyncio import AsyncSession
 
 

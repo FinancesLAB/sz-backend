@@ -16,9 +16,9 @@ from app.schemas.auth import LogoutIn, RefreshIn, RefreshSessionCreate, Register
 from app.schemas.user import UserCreateAdm, UserResponsePublic
 from fastapi import HTTPException, status
 from jose import JWTError
-from shared.models.refresh_sessions import RefreshSession
-from shared.repositories.refresh_session import RefreshSessionRepositoryPostgres
-from shared.repositories.user import UserRepositoryPostgres
+from app.models import RefreshSession
+from app.repositories.refresh_session import RefreshSessionRepositoryPostgres
+from app.repositories import UserRepositoryPostgres
 
 
 # check db number of trans

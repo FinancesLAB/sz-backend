@@ -10,9 +10,9 @@ from app.services.users import UserService
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from shared.repositories.portfolio import PortfolioRepositoryPostgres
-from shared.repositories.trade import TradeRepositoryPostgres
-from shared.repositories.user import UserRepositoryPostgres
+from app.repositories import PortfolioRepositoryPostgres
+from app.repositories import TradeRepositoryPostgres
+from app.repositories import UserRepositoryPostgres
 from sqlalchemy.ext.asyncio import AsyncSession
 
 

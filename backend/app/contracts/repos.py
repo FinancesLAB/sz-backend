@@ -4,9 +4,9 @@ from typing import Protocol
 from app.schemas.portfolio import PortfolioCreateAdm, PortfolioCreatePublic, PortfolioUpdateAdm
 from app.schemas.trade import TradeCreate, TradeUpdate
 from app.schemas.user import UserCreateAdm, UserUpdateAdm
-from shared.models.portfolio import Portfolio
-from shared.models.trade import Trade
-from shared.models.user import User
+from app.models import Portfolio
+from app.models.trade import Trade
+from app.models import User
 
 
 class PortfolioRepository(Protocol):

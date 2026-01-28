@@ -20,10 +20,10 @@ from app.schemas.analytics import (
     TopPosition,
 )
 from fastapi import HTTPException
-from shared.repositories.asset import AssetRepositoryPostgres
-from shared.repositories.asset_price import AssetPriceRepositoryPostgres
-from shared.repositories.portfolio import PortfolioRepositoryPostgres
-from shared.repositories.trade import TradeRepositoryPostgres
+from app.repositories import AssetRepositoryPostgres
+from app.repositories.asset_price import AssetPriceRepositoryPostgres
+from app.repositories import PortfolioRepositoryPostgres
+from app.repositories import TradeRepositoryPostgres
 from sqlalchemy.ext.asyncio import AsyncSession
 
 

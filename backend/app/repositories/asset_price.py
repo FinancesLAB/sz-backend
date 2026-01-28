@@ -2,7 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from app.schemas.asset_price import AssetPriceCreate
-from shared.models.asset_price import AssetPrice
+from app.models import AssetPrice
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 

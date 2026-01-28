@@ -1,5 +1,5 @@
 from app.schemas.user import UserCreateAdm, UserUpdateAdm
-from shared.models.user import User
+from app.models import User
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 

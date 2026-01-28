@@ -3,7 +3,7 @@ from app.schemas.portfolio import (
     PortfolioCreatePublic,
     PortfolioUpdateAdm,
 )
-from shared.models.portfolio import Portfolio
+from app.models import Portfolio
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 

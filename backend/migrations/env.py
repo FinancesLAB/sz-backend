@@ -8,8 +8,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.core.config import settings
 from app.infrastructure.db.database import Base
-from shared.models import asset, asset_price, portfolio, refresh_sessions, trade, user  # noqa: F401
-
+from app.models import asset, trade  # noqa: F401
 
 config = context.config
 

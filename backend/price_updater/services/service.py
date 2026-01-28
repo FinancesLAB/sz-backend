@@ -1,7 +1,7 @@
 from app.schemas.asset_price import AssetPriceCreate
 from loguru import logger
 from price_updater.clients.moex_client import MoexClient
-from shared.repositories.asset_price import AssetPriceRepositoryPostgres
+from app.repositories.asset_price import AssetPriceRepositoryPostgres
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
