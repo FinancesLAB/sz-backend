@@ -24,7 +24,7 @@ cd backend
 
 docker compose --env-file .env.example up -d --build
 
-При старте backend автоматически выполнит alembic миграции, сваггер будет доступен по http://localhost:8000/docs
+После запуска Swagger будет доступен по http://localhost:8000/docs
 
 # Идея проекта
 - Автоматически собирать цены активов с MOEX через API
