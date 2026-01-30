@@ -17,7 +17,9 @@
   - Обновляет в PostgreSQL
   - Публикует обновления через Redis
 - PostgreSQL - основное хранилище
-- Redis - кэш, pub/sub в скором времени
+- Redis
+  - Cache
+  - Pub/Sub (в разработке)
 
 #  QUICKSTART
 
