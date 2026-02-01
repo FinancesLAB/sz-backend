@@ -55,11 +55,11 @@ def get_auth_service(session: AsyncSession = Depends(get_session)) -> AuthServic
     return AuthService(session=session)
 
 
-# oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/api/auth/login')
+# get_access_token = OAuth2PasswordBearer(tokenUrl='/api/auth/login')
 #
 #
 # async def get_current_user(
-#     token: str = Depends(oauth2_scheme),
+#     token: str = Depends(get_access_token),
 #     service: UserService = Depends(get_user_service),
 # ):
 #     try:
