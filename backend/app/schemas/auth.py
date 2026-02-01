@@ -1,9 +1,10 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, EmailStr
 from pydantic.types import AwareDatetime
 
 
 class APIModel(BaseModel):
     model_config = ConfigDict(
+        from_attributes=True,
         extra='forbid',
         str_strip_whitespace=True,
     )
@@ -21,7 +22,7 @@ class RefreshIn(APIModel):
 
 class RegisterIn(APIModel):
     name: str
-    email: str
+    email: EmailStr
     password: str
 
 

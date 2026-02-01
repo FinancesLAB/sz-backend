@@ -1,10 +1,18 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, EmailStr
 from pydantic.types import AwareDatetime
 
 
-class UserFields(BaseModel):
+class APIModel(BaseModel):
+    model_config = ConfigDict(
+        from_attributes=True,
+        extra='forbid',
+        str_strip_whitespace=True,
+    )
+
+
+class UserFields(APIModel):
     name: str
-    email: str
+    email: EmailStr
 
 
 class UserCreatePublic(UserFields):
@@ -17,12 +25,12 @@ class UserCreateAdm(UserFields):
 
 class UserUpdatePublic(UserFields):
     name: str | None = None
-    email: str | None = None
+    email: EmailStr | None = None
 
 
 class UserUpdateAdm(UserFields):
     name: str | None = None
-    email: str | None = None
+    email: EmailStr | None = None
     hashed_password: str | None = None
 
 
